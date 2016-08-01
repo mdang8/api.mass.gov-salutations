@@ -1,0 +1,415 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1",
+        "title": "Salutations API",
+        "description": "Salutations extension of the Hello World simple API"
+    },
+    "basePath": "/v1",
+    "schemes": [
+        "https"
+    ],
+    "paths": {
+        "/hello": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "200 response",
+                        "schema": {
+                            "$ref": "#/definitions/Success"
+                        }
+                    },
+                    "301": {
+                        "description": "301 response. Redirects to /v1/salutations."
+                    }
+                }
+            }
+        },
+        "/salutations": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "The Salutations endpoint returns information about all the people records. The response includes the id, name, greeting, and gender of each person.",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Name of the person",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "greeting",
+                        "in": "query",
+                        "description": "Greeting of the person",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "gender",
+                        "in": "query",
+                        "description": "Gender of the person",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "200 response. An array of all the records.",
+                        "schema": {
+                            "$ref": "#/definitions/Success"
+                        }
+                    },
+                    "400": {
+                        "description": "400 response. Bad request.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "500": {
+                        "description": "500 response. Internal server error.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "Creates a person record. The ID will be assigned by the system.",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Salutations object to be updated",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Salutation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "200 response",
+                        "schema": {
+                            "$ref": "#/definitions/Success"
+                        }
+                    },
+                    "400": {
+                        "description": "400 response. Bad request.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "500": {
+                        "description": "500 response. Internal server error.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "Updates all the records.",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Salutations object to be updated",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Salutation"
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Name of the person",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "greeting",
+                        "in": "query",
+                        "description": "Greeting of the person",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "gender",
+                        "in": "query",
+                        "description": "Gender of the person",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "200 response. One single record.",
+                        "schema": {
+                            "$ref": "#/definitions/Success"
+                        }
+                    },
+                    "400": {
+                        "description": "400 response. Bad request.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "500": {
+                        "description": "500 response. Internal server error.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/salutations/id": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "The Salutations ID endpoint returns information about one specific person record. The response includes the id, name, greeting, and gender of the person.",
+                "responses": {
+                    "200": {
+                        "description": "200 response",
+                        "schema": {
+                            "$ref": "#/definitions/Success"
+                        }
+                    },
+                    "400": {
+                        "description": "400 response. Bad request.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "500": {
+                        "description": "500 response. Internal server error.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "description": "Updates one specific person record.",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Salutations object to be updated",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Salutation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "200 response",
+                        "schema": {
+                            "$ref": "#/definitions/Success"
+                        }
+                    },
+                    "400": {
+                        "description": "400 response. Bad request.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "500": {
+                        "description": "500 response. Internal server error.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes one specific person record.",
+                "responses": {
+                    "200": {
+                        "description": "200 response",
+                        "schema": {
+                            "$ref": "#/definitions/Success"
+                        }
+                    },
+                    "400": {
+                        "description": "400 response. Bad request.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "500": {
+                        "description": "500 response. Internal server error.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Empty": {
+            "type": "object"
+        },
+        "Error": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "The HTTP response status code"
+                },
+                "developerMessage": {
+                    "type": "string",
+                    "description": "Verbose, plain language description of the problem. Provide developers suggestions about how to solve their problems here."
+                },
+                "userMessage": {
+                    "type": "string",
+                    "description": "This is a message that can be passed along to end-users, if needed."
+                },
+                "errorCode": {
+                    "type": "string",
+                    "description": "This can be used to identify the error and be able to lookup a possible solution."
+                },
+                "moreInfo": {
+                    "type": "string",
+                    "description": "Where to find additional information about the error"
+                }
+            }
+        },
+        "Success": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "The HTTP response status code"
+                },
+                "message": {
+                    "type": "string",
+                    "description": "Status message"
+                },
+                "error": {
+                    "type": "string",
+                    "description": "Displays any errors"
+                },
+                "resultSet": {
+                    "type": "object",
+                    "description": "Information about the data returned",
+                    "properties": {
+                        "count": {
+                            "type": "integer",
+                            "format": "int32"
+                        },
+                        "offset": {
+                            "type": "integer",
+                            "format": "int32"
+                        },
+                        "limit": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                }
+            }
+        },
+        "Salutation": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name to update."
+                },
+                "greeting": {
+                    "type": "string",
+                    "description": "The greeting to update."
+                },
+                "gender": {
+                    "type": "string",
+                    "description": "The gender to update."
+                },
+                "message": {
+                    "type": "string",
+                    "description": "The message to update."
+                }
+            }
+        }
+    }
+}{
+  "swagger": "2.0",
+  "info": {
+    "version": "2016-07-22T19:47:28Z",
+    "title": "Salutations-API-GET"
+  },
+  "host": "2igcrwxmib.execute-api.us-west-2.amazonaws.com",
+  "basePath": "/v1",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/hello": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "200 response",
+            "schema": {
+              "$ref": "#/definitions/Success"
+            }
+          },
+          "301": {
+            "description": "301 response"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "uri": "arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-west-2:217022258023:function:hello-get/invocations",
+          "passthroughBehavior": "when_no_match",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },

@@ -1,0 +1,31 @@
+{
+
+   "salutationsData": [
+      
+     {
+        "id": "0",
+        "name": "World",
+        "greeting": "Hello",
+        "gender": "none",
+        "message": "Default return"
+      },
+      
+      {
+        "id": "1",
+        "name": "John",
+        "greeting": "Hello",
+        "gender": "male",
+        "message": "Message goes here"
+      },
+      
+      {
+        "id": "2",
+        "name": "Jane",
+        "greeting": "Hello",
+        "gender": "female",
+        "message": "Message goes here"
+      }
+       
+   ]
+
+}
