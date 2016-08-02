@@ -1,18 +1,18 @@
 'use strict';
 let https = require('https');
 var AWS = require('aws-sdk');
-AWS.config.region = 'us-west-2';
+AWS.config.region = 'us-east-1';
 var fs = require('fs');
 
 exports.handler = (event, context, callback) => {
-    var request = https.get("https://s3-us-west-2.amazonaws.com/salutations-bucket/salutations-data.json",
+    var request = https.get("https://s3.amazonaws.com/salutations-data.api.mass.gov/salutations-data.json",
         function(response) {
             var body = '';
-    
+
             response.on("data", function(chunk) {
                 body += chunk;
             });
-    
+
             response.on("end", function() {
                 try {
                     body = JSON.parse(body);
@@ -31,7 +31,7 @@ exports.handler = (event, context, callback) => {
         var greeting = event.greeting !== undefined ? event.greeting : '';
         var gender = event.gender !== undefined ? event.gender : '';
         var message = event.message !== undefined ? event.message : '';
-        
+
         var newRecord = {
             "id": id.toString(),
             "name": name,
@@ -39,11 +39,12 @@ exports.handler = (event, context, callback) => {
             "gender": gender,
             "message": message
         }
-    
+
         data['salutationsData'].push(newRecord);
         writeData(JSON.stringify(data));
+        console.log(data);
     }
-    
+
     var writeData = function(data) {
         fs.writeFile("/tmp/salutations-data.json", data, function(err) {
             if(err)
@@ -51,27 +52,29 @@ exports.handler = (event, context, callback) => {
             else
                 console.log("writeFile succeeded");
         });
-    
-        postData(data);
+
+        uploadData(data);
     }
-    
-    var postData = function(data) {
+
+    var uploadData = function(data) {
         var body = fs.readFile("/tmp/salutations-data.json");
         var s3obj = new AWS.S3({
             params: {
-                Bucket: "salutations-bucket",
+                Bucket: "salutations-data.api.mass.gov",
                 Key: "salutations-data.json"
             }
         });
-    
+
         try {
-            s3obj.upload({Body: data}).on('httpUploadProgress', function(evt) { 
-                console.log(evt); 
-            }).send(function(err, data) { 
-                console.log(err, data) 
+            s3obj.upload({Body: data}).on('httpUploadProgress', function(evt) {
+                console.log(evt);
+            }).send(function(err, data) {
+                console.log(err, data)
             });
         } catch (err) {
             context.fail("Error on upload.");
         }
+
+        context.done(null, data);
     }
 };
