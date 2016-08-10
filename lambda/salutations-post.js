@@ -36,7 +36,17 @@ exports.handler = (event, context) => {
 
     // adds a new record to the JSON data
     var addRecord = function(data) {
-        var id = data.length;  // index starts at 0
+
+        //Creates id for new record
+        var counter=0;
+        for (var key in data) {
+          if (parseInt(data[key].id) > counter){
+              counter = parseInt(data[key].id);
+          }//End if
+        }//End For
+        counter = counter + 1;
+
+        var id = counter;  // index starts at 0
         var name = event.name !== undefined ? event.name : '';
         var greeting = event.greeting !== undefined ? event.greeting : '';
         var gender = event.gender !== undefined ? event.gender : '';
@@ -81,11 +91,8 @@ exports.handler = (event, context) => {
                 console.log(err, data);
             });
 
-            // waits one second before making another GET request in case of latency
-            setTimeout(function() {
-                // calls the getData function with the showUpdates function as the callback
-                getData(showUpdates);
-            }, 1000);
+            // calls the getData function with the showUpdates function as the callback
+            getData(showUpdates);
 
         } catch (err) {
             // exits lambda fucntion, returns fail
@@ -95,7 +102,11 @@ exports.handler = (event, context) => {
 
     // returns the new data to show the changes and exits the lambda function
     var showUpdates = function(data) {
-        return context.done(null, data);
+        var len = data.length;
+
+        var toShow = data[len - 1];
+
+        return context.done(null, toShow);
     };  // end of showUpdates
 
     // initializes the program by calling the getData function with the addRecord function as the callback
