@@ -7,7 +7,7 @@ exports.handler = (event, context) => {
     //declares delRecord variable
     var objDelRecord;
 
-    // makes a GET request to get the JSON file from the S3 bucket
+    // makes a GET request to get the active data JSON file from the S3 bucket
     // the getData function takes in a callback function as an argument
     var getData = function(callback) {
         https.get("https://s3.amazonaws.com/salutations-data.api.mass.gov/salutations-data.json",
@@ -35,7 +35,7 @@ exports.handler = (event, context) => {
             });
     };  // end of getData
 
-    // makes a GET request to get the JSON file from the S3 bucket
+    // makes a GET request to get the disabled data JSON file from the S3 bucket
     // the getDisabledData function takes in a callback function as an argument
     var getDisabledData = function(callback) {
         https.get("https://s3.amazonaws.com/salutations-data.api.mass.gov/salutations-disabled-data.json",
@@ -68,13 +68,13 @@ exports.handler = (event, context) => {
         var id = event.id !== undefined ? event.id : '';
         var idIsThere = false;
 
+        //checks for 0 id
+        if (id === "0"){
+            return context.done(null, "Cannot delete id: 0. Please try a different id.");
+        }
+
         // loops through each object in the JSON data
         for (var i = 0; i < data.length; i++) {
-
-            //checks for 0 id
-            if (id===0){
-                return context.done(null, "Cannot delete id: 0. Please try a different id.");
-            }
 
             // compares the input id with the object id
             if (data[i].id === id) {
@@ -102,7 +102,7 @@ exports.handler = (event, context) => {
         }//End For Loop
 
         //Exits if id is not there
-        if (idIsThere===false){
+        if (!idIsThere) {
             return context.done(null, "Id not found in record set.");
         } else {
             uploadData(JSON.stringify(data));
@@ -111,13 +111,19 @@ exports.handler = (event, context) => {
 
     };//End deleteRecord
 
+    // adds the disabled record to the data in the disabled JSON data file and
+    // uploads the modified disabled data to the S3 bucket
     var addToDisabled = function(data, record) {
+
+        // adds the record object to the JSON data array
         data.push(record);
 
+        // calls the uploadDisabledData function with a string of the JSON data
+        // as the argument
         uploadDisabledData(JSON.stringify(data));
     };
 
-    // uploads the JSON file to the S3 bucket
+    // uploads the active data JSON file to the S3 bucket
     var uploadData = function(body) {
         body = "{ \"salutationsData\":\n\n" + body + "\n\n}";
 
@@ -146,11 +152,9 @@ exports.handler = (event, context) => {
         }
     };  // end of uploadData
 
-    // uploads the JSON file to the S3 bucket
+    // uploads the disabled data JSON file to the S3 bucket
     var uploadDisabledData = function(body) {
         body = "{ \"salutationsDisabledData\":\n\n" + body + "\n\n}";
-
-        console.log(body);
 
         // s3 parameters for uploading
         var s3obj = new AWS.S3({
