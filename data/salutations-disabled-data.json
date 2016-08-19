@@ -1,0 +1,15 @@
+{
+
+    "salutationsDisabledData": [
+
+        {
+            "id": "0",
+            "name": "Disabled-World",
+            "greeting": "Hello",
+            "gender": "none",
+            "message": "Default return"
+        }
+        
+    ]
+
+}

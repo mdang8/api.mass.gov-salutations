@@ -7,7 +7,8 @@
             "name": "World",
             "greeting": "Hello",
             "gender": "none",
-            "message": "Default return"
+            "message": "Default return",
+            "isDisabled": "false"
         },
 
         {
@@ -15,7 +16,8 @@
             "name": "John",
             "greeting": "Hello",
             "gender": "male",
-            "message": "Message goes here"
+            "message": "Message goes here",
+            "isDisabled": "false"
         },
 
         {
@@ -23,7 +25,8 @@
             "name": "Jane",
             "greeting": "Hello",
             "gender": "female",
-            "message": "Message goes here"
+            "message": "Message goes here",
+            "isDisabled": "false"
         },
 
         {
@@ -31,7 +34,8 @@
             "name": "Matt",
             "greeting": "Hola",
             "gender": "male",
-            "message": "Post new record"
+            "message": "Post new record",
+            "isDisabled": "false"
         },
 
         {
@@ -39,7 +43,8 @@
             "name": "Mark",
             "greeting": "Hello",
             "gender": "male",
-            "message": "Post from API Gateway"
+            "message": "Modify this message",
+            "isDisabled": "false"
         },
 
         {
@@ -47,7 +52,8 @@
             "name": "Sam",
             "greeting": "Hello",
             "gender": "male",
-            "message": "Post from API Gateway"
+            "message": "Post from API Gateway",
+            "isDisabled": "false"
         },
 
         {
@@ -55,7 +61,8 @@
             "name": "Jessica",
             "greeting": "Hola",
             "gender": "female",
-            "message": "Some message"
+            "message": "Some message",
+            "isDisabled": "false"
         },
 
         {
@@ -63,7 +70,8 @@
             "name": "Jessica",
             "greeting": "Hola",
             "gender": "female",
-            "message": "Some message"
+            "message": "Some message",
+            "isDisabled": "false"
         },
 
         {
@@ -71,7 +79,17 @@
             "name": "Mary",
             "greeting": "Hola",
             "gender": "female",
-            "message": "Some message"
+            "message": "Some message",
+            "isDisabled": "false"
+        },
+
+        {
+            "id": "9",
+            "name": "TestGateway",
+            "greeting": "Hello",
+            "gender": "undefined",
+            "message": "default",
+            "isDisabled": "false"
         }
 
     ]
