@@ -35,11 +35,11 @@ exports.handler = (event, context) => {
 
     // updates the record in the JSON data with the specified id
     var updateRecord = function(data) {
-        var id = event.id !== undefined ? event.id : '';
-        var name = event.name !== undefined ? event.name : '';
-        var greeting = event.greeting !== undefined ? event.greeting : '';
-        var gender = event.gender !== undefined ? event.gender : '';
-        var message = event.message !== undefined ? event.message : '';
+        var id = event.params.id !== undefined ? event.params.id : '';
+        var name = event.body.name !== undefined ? event.body.name : '';
+        var greeting = event.body.greeting !== undefined ? event.body.greeting : '';
+        var gender = event.body.gender !== undefined ? event.body.gender : '';
+        var message = event.body.message !== undefined ? event.body.message : '';
 
         // sets each parameter to be updated
         var parameters = {
@@ -119,7 +119,7 @@ exports.handler = (event, context) => {
 
     // returns the new data to show the changes and exits the lambda function
     var showUpdates = function(data) {
-        var id = event.id !== undefined ? event.id : '';
+        var id = event.params.id !== undefined ? event.params.id : '';
 
         // the record object that was updated
         var toShow;

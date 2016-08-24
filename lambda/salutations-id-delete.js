@@ -65,7 +65,7 @@ exports.handler = (event, context) => {
 
     // deletes the record with the specified id paramater
     var deleteRecord = function(data) {
-        var id = event.id !== undefined ? event.id : '';
+        var id = event.params.id !== undefined ? event.params.id : '';
         var idIsThere = false;
 
         //checks for 0 id
