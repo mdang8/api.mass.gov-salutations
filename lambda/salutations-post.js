@@ -2,7 +2,6 @@
 let https = require('https');
 var AWS = require('aws-sdk');
 AWS.config.region = 'us-east-1';
-var fs = require('fs');
 
 exports.handler = (event, context) => {
 
@@ -47,10 +46,11 @@ exports.handler = (event, context) => {
         counter = counter + 1;
 
         var id = counter;  // index starts at 0
-        var name = event.name !== undefined ? event.name : '';
-        var greeting = event.greeting !== undefined ? event.greeting : '';
-        var gender = event.gender !== undefined ? event.gender : '';
-        var message = event.message !== undefined ? event.message : '';
+        var name = event.body.name !== undefined ? event.body.name : '';
+        var greeting = event.body.greeting !== undefined ? event.body.greeting : '';
+        var gender = event.body.gender !== undefined ? event.body.gender : '';
+        var message = event.body.message !== undefined ? event.body.message : '';
+        var isDisabled = "false";
 
         // the new record object to add with the parameters from the event
         var newRecord = {
@@ -58,7 +58,8 @@ exports.handler = (event, context) => {
             "name": name,
             "greeting": greeting,
             "gender": gender,
-            "message": message
+            "message": message,
+            "isDisabled": isDisabled
         };
 
         // adds the new record to the JSON array
@@ -77,7 +78,6 @@ exports.handler = (event, context) => {
             params: {
                 Bucket: "salutations-data.api.mass.gov",
                 Key: "salutations-data.json",
-                //ContentType: "text/html",
                 Body: body
             }
         });
