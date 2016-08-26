@@ -93,7 +93,6 @@ exports.handler = (event, context) => {
             params: {
                 Bucket: "salutations-data.api.mass.gov",
                 Key: "salutations-data.json",
-                //ContentType: "text/html",
                 Body: body
             }
         });

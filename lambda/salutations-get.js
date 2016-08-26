@@ -33,10 +33,11 @@ exports.handler = (event, context, callback) => {
 
     // determines what data to return
     var getData = function(data) {
-        var name = event.name !== undefined ? event.name : '';
-        var greeting = event.greeting !== undefined ? event.greeting :
+        var name = event.query.name !== undefined ? event.query.name : '';
+        var greeting = event.query.greeting !== undefined ? event.query.greeting :
             '';
-        var gender = event.gender !== undefined ? event.gender : '';
+        var gender = event.query.gender !== undefined ? event.query.gender : '';
+        var message = event.query.message !== undefined ? event.query.message : '';
 
         // the list to be returned
         var salutationsList = [];
