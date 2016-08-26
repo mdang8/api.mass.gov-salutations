@@ -32,18 +32,43 @@ var getData = function() {
     // const gender = event.gender !== undefined ? event.gender : '';
     // const message = event.message !== undefined ? event.message : '';
 
-    const name = '';
+    const name = 'John';
     const greeting = '';
-    const gender = '';
-    const meeting = '';
+    const gender = 'male';
+    const message = '';
+
+    let queryStr = "SELECT * FROM Salutations";
 
     if (name === '' && greeting === '' && gender === '' && message === '') {
         console.log("Return all.");
-        var queryStr = "SELECT * FROM Salutations";
 
         sendQuery(queryStr);
         return;
+    } else {
+        queryStr = queryStr + " WHERE";
     }
+
+    if (name !== '') {
+        queryStr = queryStr + " NAME = " + name + " AND";
+    }
+
+    if (greeting !== '') {
+        queryStr = queryStr + " GREETING = " + greeting + " AND";
+    }
+
+    if (gender !== '') {
+        queryStr = queryStr + " GENDER = " + gender + " AND";
+    }
+
+    if (message !== '') {
+        queryStr = queryStr + " MESSAGE = " + message + " AND";
+    }
+
+    // removes the " AND" at the end of the query string
+    queryStr.slice(-4);
+
+    console.log("Query String is: " + queryStr);
+    sendQuery(queryStr);
 };
 
 /**
