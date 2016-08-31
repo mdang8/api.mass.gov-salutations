@@ -1,101 +1,90 @@
 'use strict';
-let https = require('https');
-var AWS = require('aws-sdk');
+const https = require('https');
+const AWS = require('aws-sdk');
+const s3obj = new AWS.S3();
 
 exports.handler = (event, context) => {
+
+    const bucket = "salutations-data.api.mass.gov";
 
     //declares delRecord variable
     var objDelRecord;
 
-    // makes a GET request to get the active data JSON file from the S3 bucket
-    // the getData function takes in a callback function as an argument
-    var getData = function(callback) {
-        https.get("https://s3.amazonaws.com/salutations-data.api.mass.gov/salutations-data.json",
-            function(response) {
-                var body = '';
+    var key;
 
-                // accepts data stream and adds to body variable
-                response.on("data", function(chunk) {
-                    body += chunk;
-                });
+    // initializes the program by calling the getData function with the updateRecord function as the callback
+    getData(deleteRecord);
 
-                // triggers when data stream is complete
-                response.on("end", function() {
-                    try {
-                        // parses body variable data into object array
-                        body = JSON.parse(body).salutationsData;
+    // gets the active JSON data object from the S3 bucket
+    //noinspection JSAnnotator
+    function getData(type, callback) {
+        if (type === "active") {
+            key = "salutations-data.json";
+        } else {
+            key = "salutations-disabled-data.json";
+        }
 
-                        // calls the callback function once the data is ready
-                        callback(body);
-                    } catch(err) {
-                        // returns fail
-                        return context.fail("Error with parsing active data JSON body: " + err);
+        var params = {
+            Bucket: bucket,
+            Key: key
+        };
+
+        s3obj.getObject(params, function(err, data) {
+            if (err) {
+                console.log(err, err.stack);
+                return context.fail("Error with getting " + type + " S3 object: " + err);
+            } else {
+                try {
+                    var dataBody = data.Body;
+                    var jsonData = JSON.parse(dataBody.toString('utf8'));
+
+                    if (type === "active") {
+                        callback(jsonData);
+                    } else {
+                        callback(jsonData, objDelRecord);
                     }
-                });
-            });
-    };  // end of getData
-
-    // makes a GET request to get the disabled data JSON file from the S3 bucket
-    // the getDisabledData function takes in a callback function as an argument
-    var getDisabledData = function(callback) {
-        https.get("https://s3.amazonaws.com/salutations-data.api.mass.gov/salutations-disabled-data.json",
-            function(response) {
-                var body = '';
-
-                // accepts data stream and adds to body variable
-                response.on("data", function(chunk) {
-                    body += chunk;
-                });
-
-                // triggers when data stream is complete
-                response.on("end", function() {
-                    try {
-                        // parses body variable data into object array
-                        body = JSON.parse(body).salutationsDisabledData;
-
-                        // calls the callback function once the data is ready
-                        callback(body, objDelRecord);
-                    } catch(err) {
-                        // returns fail
-                        return context.fail("Error with parsing disabled data JSON body: " + err);
-                    }
-                });
-            });
-    };  // end of getDisabledData
+                } catch (err) {
+                    return context.fail("Error with parsing " + type + " data: " + err);
+                }
+            }
+        });
+    }  // end of getData
 
     // deletes the record with the specified id paramater
-    var deleteRecord = function(data) {
+    function deleteRecord(data) {
+        var records = data.salutationsData;
+
         var id = event.params.id !== undefined ? event.params.id : '';
         var idIsThere = false;
 
         //checks for 0 id
         if (id === "0"){
-            return context.done(null, "Cannot delete id: 0. Please try a different id.");
+            return context.fail("Cannot delete id: 0. Please try a different id.");
         }
 
         // loops through each object in the JSON data
-        for (var i = 0; i < data.length; i++) {
+        for (var i = 0; i < records.length; i++) {
 
             // compares the input id with the object id
-            if (data[i].id === id) {
+            if (records[i].id === id) {
 
                 // assigns idIsThere check
                 idIsThere = true;
 
-                data[i].isDisabled = "true";
+                records[i].isDisabled = "true";
 
                 //assign deleted record
                 objDelRecord = {
-                  "id": data[i].id,
-                  "name": data[i].name,
-                  "greeting": data[i].greeting,
-                  "gender": data[i].gender,
-                  "message": data[i].message,
-                  "isDisabled": data[i].isDisabled
+                  "id": records[i].id,
+                  "name": records[i].name,
+                  "greeting": records[i].greeting,
+                  "gender": records[i].gender,
+                  "message": records[i].message,
+                  "isDisabled": records[i].isDisabled
                 };
 
                 //Remove (delete) object from array
-                data.splice(i, 1);
+                records.splice(i, 1);
                 //break;
             }//End if
 
@@ -103,89 +92,90 @@ exports.handler = (event, context) => {
 
         //Exits if id is not there
         if (!idIsThere) {
-            return context.done(null, "Id not found in record set.");
+            return context.fail("Id not found in record set.");
         } else {
-            uploadData(JSON.stringify(data));
-            getDisabledData(addToDisabled);
+            uploadData(JSON.stringify(records), function() {
+                getData("disabled", addToDisabled);
+            });
         }
 
-    };//End deleteRecord
+    }  //End deleteRecord
 
     // adds the disabled record to the data in the disabled JSON data file and
     // uploads the modified disabled data to the S3 bucket
-    var addToDisabled = function(data, record) {
+    function addToDisabled(data, newRecord) {
+        var records = data.salutationsDisabledData;
 
         // adds the record object to the JSON data array
-        data.push(record);
+        records.push(newRecord);
 
         // calls the uploadDisabledData function with a string of the JSON data
         // as the argument
-        uploadDisabledData(JSON.stringify(data));
-    };
-
-    // uploads the active data JSON file to the S3 bucket
-    var uploadData = function(body) {
-        body = "{ \"salutationsData\":\n\n" + body + "\n\n}";
-
-        // s3 parameters for uploading
-        var s3obj = new AWS.S3({
-            params: {
-                Bucket: "salutations-data.api.mass.gov",
-                Key: "salutations-data.json",
-                //ContentType: "text/html",
-                Body: body
+        uploadData(JSON.stringify(records), "disabled", function(err, data) {
+            if (err) {
+                console.log(err, err.stack);
+            } else {
+                return context.done(null, objDelRecord);
             }
         });
+    }
+
+    // uploads the active data JSON file to the S3 bucket
+    function uploadData(body, type, callback) {
+        if (type === "active") {
+            body = "{ \"salutationsData\":\n\n" + body + "\n\n}";
+        } else {
+            body = "{ \"salutationsDisabledData\":\n\n" + body + "\n\n}";
+        }
+
+        var params = {
+            Bucket: bucket,
+            Key: key,
+            Body: body
+        };
 
         // try-catch for uploading errors
         try {
             // uploads the modified data
-            s3obj.upload().on('httpUploadProgress', function(evt) {
-                console.log(evt);
-            }).send(function(err, data) {
+            s3obj.upload(params, function(err, data) {
                 console.log(err, data);
-            });
+                console.log(type + " data has been uploaded.");
 
+                callback();
+            });
         } catch (err) {
             // exits lambda fucntion, returns fail
-            return context.fail("Error on active upload: " + err);
+            return context.fail("Error on " + type + " upload: " + err);
         }
-    };  // end of uploadData
+
+        callback();
+    }  // end of uploadData
 
     // uploads the disabled data JSON file to the S3 bucket
-    var uploadDisabledData = function(body) {
+    function uploadDisabledData(body) {
         body = "{ \"salutationsDisabledData\":\n\n" + body + "\n\n}";
 
         // s3 parameters for uploading
-        var s3obj = new AWS.S3({
-            params: {
-                Bucket: "salutations-data.api.mass.gov",
-                Key: "salutations-disabled-data.json",
-                //ContentType: "text/html",
-                Body: body
-            }
-        });
+        var disabledParams = {
+            Bucket: "salutations-data.api.mass.gov",
+            Key: "salutations-disabled-data.json",
+            Body: body
+        };
 
         // try-catch for uploading errors
         try {
             // uploads the modified data
-            s3obj.upload().on('httpUploadProgress', function(evt) {
-                console.log(evt);
-            }).send(function(err, data) {
+            s3obj.upload(disabledParams, function(err, data) {
                 console.log(err, data);
+                console.log("Disabled data has been uploaded.");
+
+                // returns the deleted record details
+                return context.done(null, objDelRecord);
             });
-
-            // returns the deleted record details
-            return context.done(null, objDelRecord);
-
-
         } catch (err) {
             // exits lambda fucntion, returns fail
             return context.fail("Error on disabled upload: " + err);
         }
-    };  // end of uploadData
+    }  // end of uploadData
 
-
-    // initializes the program by calling the getData function with the updateRecord function as the callback
-    getData(deleteRecord);
 };  // end of exports handler
