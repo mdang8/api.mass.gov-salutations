@@ -49,23 +49,23 @@ var getData = function() {
     }
 
     if (name !== '') {
-        queryStr = queryStr + " NAME = " + name + " AND";
+        queryStr = queryStr + " NAME = '" + name + "' AND";
     }
 
     if (greeting !== '') {
-        queryStr = queryStr + " GREETING = " + greeting + " AND";
+        queryStr = queryStr + " GREETING = '" + greeting + "' AND";
     }
 
     if (gender !== '') {
-        queryStr = queryStr + " GENDER = " + gender + " AND";
+        queryStr = queryStr + " GENDER = '" + gender + "' AND";
     }
 
     if (message !== '') {
-        queryStr = queryStr + " MESSAGE = " + message + " AND";
+        queryStr = queryStr + " MESSAGE = '" + message + "' AND";
     }
 
     // removes the " AND" at the end of the query string
-    queryStr.slice(-4);
+    queryStr = queryStr.substring(0, queryStr.length - 4);
 
     console.log("Query String is: " + queryStr);
     sendQuery(queryStr);
