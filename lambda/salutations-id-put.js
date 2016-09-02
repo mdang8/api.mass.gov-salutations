@@ -29,21 +29,28 @@ exports.handler = (event, context) => {
             Key: key
         };
 
-        // gets the data object from the S3 bucket
+        // downloads the data object from the S3 bucket
         s3obj.getObject(params, function(err, data) {
             if (err) {
                 console.log(err, err.stack);
 
+                // returns a fail if there is an error with downloading the S3 object
                 return context.fail("Error with getting S3 object: " + err);
             } else {
-                try {
-                    var dataBody = data.Body;
-                    var jsonData = JSON.parse(dataBody.toString('utf8'));
+                let dataBody;
+                let jsonData;
 
-                    callback(jsonData);
+                // try-catch for parsing the JSON
+                try {
+                    dataBody = data.Body;
+                    jsonData = JSON.parse(dataBody.toString('utf8'));
                 } catch (err) {
+                    // returns a fail if there is an error with parsing the JSON
                     return context.fail("Error with parsing data: " + err);
                 }
+
+                // makes a call to the callback function once the data has been downloaded and parsed
+                callback(jsonData);
             }
         });
 
@@ -59,6 +66,7 @@ exports.handler = (event, context) => {
     function updateRecord(jsonData) {
         var records = jsonData.salutationsData;
 
+        // gets the parameters from the event
         var id = event.params.id !== undefined ? event.params.id : '';
         var name = event.body.name !== undefined ? event.body.name : '';
         var greeting = event.body.greeting !== undefined ? event.body.greeting : '';
@@ -81,6 +89,7 @@ exports.handler = (event, context) => {
             // compares the record id with the input id
             if (records[i].id === id) {
 
+                // sets the flag to true to indicate that the id has been found
                 idExists = true;
 
                 // for each parameter name-key
@@ -100,13 +109,13 @@ exports.handler = (event, context) => {
 
                 }  // end for-loop iterating through the parameter names
 
-                // calls the uploadData function with a string of the JSON data as the argument
                 uploadData(records);
 
             }  // end if
 
         }  // end for-loop iterating through each element in the JSON data array
 
+        // if the id was not found
         if (!idExists) {
             return context.fail("The specified id does not exist in the data.");
         }
@@ -121,6 +130,7 @@ exports.handler = (event, context) => {
      * @throws context.fail if there is an error on the upload
      */
     function uploadData(jsonData) {
+        // converts the JSON to a string
         var stringJSON = JSON.stringify(jsonData);
 
         var body = "{ \"salutationsData\":\n\n" + stringJSON + "\n\n}";
@@ -139,6 +149,7 @@ exports.handler = (event, context) => {
                 console.log(err, data);
                 console.log("Data has been uploaded.");
 
+                // calls the getData function with the showUpdates function as the callback
                 getData(showUpdates);
             });
         } catch (err) {

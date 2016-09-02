@@ -29,25 +29,32 @@ exports.handler = (event, context) => {
             Key: key
         };
 
-        // gets the data object from the S3 bucket
+        // downloads the data object from the S3 bucket
         s3obj.getObject(params, function(err, data) {
             if (err) {
                 console.log(err, err.stack);
 
+                // returns a fail if there is an error with downloading the S3 object
                 return context.fail("Error with getting S3 object: " + err);
             } else {
-                try {
-                    var dataBody = data.Body;
-                    var jsonData = JSON.parse(dataBody.toString('utf8'));
+                let dataBody;
+                let jsonData;
 
-                    callback(jsonData);
+                // try-catch for parsing the JSON
+                try {
+                    dataBody = data.Body;
+                    jsonData = JSON.parse(dataBody.toString('utf8'));
                 } catch (err) {
+                    // returns a fail if there is an error with parsing the JSON
                     return context.fail("Error with parsing data: " + err);
                 }
+
+                // makes a call to the callback function once the data has been downloaded and parsed
+                callback(jsonData);
             }
         });
 
-    }  // end of getData
+    }  // end of getData,
 
     /**
      * Updates all the records in the JSON data.
@@ -57,6 +64,7 @@ exports.handler = (event, context) => {
     function updateRecord(jsonData) {
         var records = jsonData.salutationsData;
 
+        // gets the parameters from the event
         var name = event.body.name !== undefined ? event.body.name : '';
         var greeting = event.body.greeting !== undefined ? event.body.greeting : '';
         var gender = event.body.gender !== undefined ? event.body.gender : '';
@@ -78,15 +86,16 @@ exports.handler = (event, context) => {
                 // loops through each element in the JSON data array
                 for (var i = 0; i < records.length; i++) {
                     // condition: do not update id:0
-                    if (records[i].id !== '0'){
+                    if (records[i].id !== '0') {
                         // update the object's parameter value
                         records[i][p] = records[i].hasOwnProperty(p) && records[i][p] !== undefined ? parameters[p] : '';
                     }  // end if
+
                 }  // end for data
             }  // end if parameters
+
         }  // end for parameters
 
-        // calls the uploadData function with a string of the JSON data as the argument
         uploadData(records);
 
     }  // end of updateRecord
@@ -117,6 +126,7 @@ exports.handler = (event, context) => {
                 console.log(err, data);
                 console.log("Data has been uploaded.");
 
+                // calls the getData function with the showUpdates function as the callback
                 getData(showUpdates);
             });
         } catch (err) {
